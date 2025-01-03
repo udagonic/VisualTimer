@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ビジュアルタイマー</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
+        .timer-container {
+            text-align: center;
+        }
+        .circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: conic-gradient(#3498db 0%, #ddd 0%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        .time {
+            position: absolute;
+            font-size: 2em;
+        }
+    </style>
+</head>
+<body>
+    <class="timer-container">
+        <div class="circle" id="circle">
+            <div class="time" id="time">00:00</div>
+        </div>
+        <input type="number" id="minutesInput" placeholder="分を入力" min="1" />
+        <button onclick="startTimer()">開始</button>
+        <audio id="alarmSound" src="sound.mp3"></audio>
+    </div>
+
+    <script>
+        let totalTime;
+        let remainingTime;
+        let timerInterval;
+
+        function startTimer() {
+            const minutes = parseInt(document.getElementById('minutesInput').value, 10);
+            if (isNaN(minutes) || minutes <= 0) {
+                alert('正しい分数を入力してください');
+                return;
+            }
+            totalTime = minutes * 60;
+            remainingTime = totalTime;
+            clearInterval(timerInterval);
+            updateCircle();
+            updateDisplay();
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        function updateTimer() {
+            if (remainingTime > 0) {
+                remainingTime--;
+                updateCircle();
+                updateDisplay();
+            } else {
+                clearInterval(timerInterval);
+                document.getElementById('alarmSound').play();
+                alert("時間が終了しました！");
+            }
+        }
+
+        function updateCircle() {
+            const circle = document.getElementById('circle');
+            const percentage = (remainingTime / totalTime) * 100;
+            const color = percentage < 10 ? '#e74c3c' : '#3498db';
+            circle.style.background = `conic-gradient(${color} ${percentage}%, #ddd ${percentage}%)`;
+        }
+
+        function updateDisplay() {
+            const timeDisplay = document.getElementById('time');
+            const minutes = Math.floor(remainingTime / 60);
+            const seconds = remainingTime % 60;
+            timeDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+    </script>
+</body>
+</html>
