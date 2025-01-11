@@ -96,6 +96,7 @@
             totalTime = minutes * 60;
             remainingTime = totalTime;
             clearInterval(timerInterval);
+            playSilentAudio(); // iOS対応: 無音再生を開始
             updateCircle();
             updateDisplay();
             timerInterval = setInterval(updateTimer, 1000);
@@ -143,7 +144,16 @@
         function updateCircle() {
             const circle = document.getElementById('circle');
             const percentage = (remainingTime / totalTime) * 100;
-            const color = percentage < 10 ? '#e74c3c' : '#3498db';
+            let color;
+
+            if (percentage < 10) {
+                color = '#e74c3c'; // 赤
+            } else if (percentage < 20) {
+                color = '#f1c40f'; // 黄色
+            } else {
+                color = '#3498db'; // 青
+            }
+
             circle.style.background = `conic-gradient(${color} ${percentage}%, #ddd ${percentage}%)`;
         }
 
@@ -152,6 +162,14 @@
             const minutes = Math.floor(remainingTime / 60);
             const seconds = remainingTime % 60;
             timeDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function playSilentAudio() {
+            // iOS対応: 無音再生で音声再生許可を取得
+            const audio = new Audio();
+            audio.play().catch(() => {
+                console.log("iOSでの音声再生初期化が必要");
+            });
         }
     </script>
 </body>
